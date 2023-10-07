@@ -14,7 +14,7 @@ void debug(std::string msg) {
 
 int main(int argc, char* argv[])
 {
-   
+
     auto start_time = std::chrono::system_clock::now();
     int  result     = 0;
 

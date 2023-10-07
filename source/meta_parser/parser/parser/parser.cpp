@@ -139,12 +139,15 @@ bool MetaParser::parseProject()
 
 int MetaParser::parse(void)
 {
-    bool parse_include_ = parseProject();
-    if (!parse_include_)
-    {
-        std::cerr << "Parsing project file error! " << std::endl;
-        return -1;
-    }
+
+
+
+    //bool parse_include_ = parseProject();
+    //if (!parse_include_)
+    //{
+    //    std::cerr << "Parsing project file error! " << std::endl;
+    //    return -1;
+    //}
 
     std::cerr << "Parsing the whole project..." << std::endl;
     int is_show_errors      = m_is_show_errors ? 1 : 0;
@@ -174,7 +177,53 @@ int MetaParser::parse(void)
 
     m_translation_unit = clang_createTranslationUnitFromSourceFile(
         m_index, m_source_include_file_name.c_str(), static_cast<int>(arguments.size()), arguments.data(), 0, nullptr);
+
+    //m_translation_unit = clang_parseTranslationUnit(
+    //    m_index,
+    //    m_source_include_file_name.c_str(), nullptr, 0,
+    //    nullptr, 0,
+    //    CXTranslationUnit_None);
+
+    if (m_translation_unit == nullptr) {
+        std::cerr << "Unable to parse translation unit. Quitting.\n";
+        return 0;
+    }
+
     auto cursor = clang_getTranslationUnitCursor(m_translation_unit);
+
+    clang_visitChildren(
+        cursor,
+        [](CXCursor current_cursor, CXCursor parent, CXClientData client_data) {
+            CXType cursor_type = clang_getCursorType(current_cursor);
+
+            CXString current_display_name = clang_getCursorDisplayName(current_cursor);
+            //Allocate a CXString representing the name of the current cursor
+
+            std::cout << "Visiting element " << clang_getCString(current_display_name) << "\n";
+
+            CXString type_kind_spelling = clang_getTypeKindSpelling(cursor_type.kind);
+            std::cout << "Type Kind: " << clang_getCString(type_kind_spelling);
+            clang_disposeString(type_kind_spelling);
+
+            if (cursor_type.kind == CXType_Pointer ||                     // If cursor_type is a pointer
+                cursor_type.kind == CXType_LValueReference ||              // or an LValue Reference (&)
+                cursor_type.kind == CXType_RValueReference) {               // or an RValue Reference (&&),
+                CXType pointed_to_type = clang_getPointeeType(cursor_type);// retrieve the pointed-to type
+
+                CXString pointed_to_type_spelling = clang_getTypeSpelling(pointed_to_type);     // Spell out the entire
+                std::cout << "pointing to type: " << clang_getCString(pointed_to_type_spelling);// pointed-to type
+                clang_disposeString(pointed_to_type_spelling);
+            }
+            else if (cursor_type.kind == CXType_Record) {
+                CXString type_spelling = clang_getTypeSpelling(cursor_type);
+                std::cout << ", namely " << clang_getCString(type_spelling);
+                clang_disposeString(type_spelling);
+            }
+            std::cout << "\n";
+            return CXChildVisit_Recurse;
+        },
+        nullptr
+    );
 
     Namespace temp_namespace;
     std::cerr << "buildClassAST..." << std::endl;

@@ -3,9 +3,7 @@ set(PRECOMPILE_TOOLS_PATH "${BIN_ROOT_DIR}")
 set(PICCOLO_PRECOMPILE_PARAMS_IN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/precompile/precompile.json.in")
 set(PICCOLO_PRECOMPILE_PARAMS_PATH "${PRECOMPILE_TOOLS_PATH}/precompile.json")
 
-message(xmy include2)
-message(${RUNTIME_HEADS})
-message(${PICCOLO_PRECOMPILE_PARAMS_IN_PATH})
+
 configure_file(${PICCOLO_PRECOMPILE_PARAMS_IN_PATH} ${PICCOLO_PRECOMPILE_PARAMS_PATH})
 
 #
@@ -56,10 +54,10 @@ COMMAND
   ${CMAKE_COMMAND} -E echo "************************************************************* "
   COMMAND
   ${CMAKE_COMMAND} -E echo "**** [Precompile] EXE "
+ COMMAND
+   ${CMAKE_COMMAND} -E echo ${PRECOMPILE_PARSER} "${PICCOLO_PRECOMPILE_PARAMS_PATH}"  "${PARSER_INPUT}"  "${ENGINE_ROOT_DIR}/source" ${sys_include} "Piccolo" 0
 COMMAND
-  ${CMAKE_COMMAND} -E echo ${PRECOMPILE_PARSER} "${PICCOLO_PRECOMPILE_PARAMS_PATH}"  "${PARSER_INPUT}"  "${ENGINE_ROOT_DIR}/source" ${sys_include} "Piccolo" 0
-COMMAND
-    ${PRECOMPILE_PARSER} "${PICCOLO_PRECOMPILE_PARAMS_PATH}"  "${PARSER_INPUT}"  "${ENGINE_ROOT_DIR}/source" ${sys_include} "Piccolo" 0
+     ${PRECOMPILE_PARSER} "${PICCOLO_PRECOMPILE_PARAMS_PATH}"  "${PARSER_INPUT}"  "${ENGINE_ROOT_DIR}/source" ${sys_include} "Piccolo" 0
 ### BUILDING ====================================================================================
 COMMAND
     ${CMAKE_COMMAND} -E echo "+++ Precompile finished +++"

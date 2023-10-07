@@ -23,7 +23,7 @@ add_executable(${TARGET_NAME} ${HEADERS} ${SOURCES})
 
 #set_target_properties(meta_parser PROPERTIES FOLDER "generator" ) 
 
-set_target_properties(${TARGET_NAME} PROPERTIES CXX_STANDARD 17)
+set_target_properties(${TARGET_NAME} PROPERTIES CXX_STANDARD 20)
 set_target_properties(${TARGET_NAME} PROPERTIES FOLDER "Tools")
 
 if (CMAKE_HOST_WIN32)
