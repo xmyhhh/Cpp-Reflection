@@ -177,7 +177,8 @@ int MetaParser::parse(void)
     auto cursor = clang_getTranslationUnitCursor(m_translation_unit);
 
     Namespace temp_namespace;
-
+    std::cerr << "buildClassAST..." << std::endl;
+  
     buildClassAST(cursor, temp_namespace);
 
     temp_namespace.clear();

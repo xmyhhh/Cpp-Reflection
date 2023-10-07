@@ -8,8 +8,13 @@ int parse(std::string project_file_name,
           std::string module_name,
           std::string show_errors);
 
+void debug(std::string msg) {
+    std::cout << msg << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
+   
     auto start_time = std::chrono::system_clock::now();
     int  result     = 0;
 
@@ -17,7 +22,13 @@ int main(int argc, char* argv[])
         argv[6] != nullptr)
     {
         MetaParser::prepare();
-
+        debug("call parse");
+        debug(argv[1]);
+        debug(argv[2]);
+        debug(argv[3]);
+        debug(argv[4]);
+        debug(argv[5]);
+        debug(argv[6]);
         result = parse(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]);
 
         auto duration_time = std::chrono::system_clock::now() - start_time;

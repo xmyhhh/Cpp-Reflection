@@ -47,7 +47,7 @@ private:
                                            "-std=c++11",
                                            "-D__REFLECTION_PARSER__",
                                            "-DNDEBUG",
-                                           "-D__clang__",
+                                           "-D__clang__","-ast-dump-xml"
                                            "-w",
                                            "-MG",
                                            "-M",
