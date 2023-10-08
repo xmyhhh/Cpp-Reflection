@@ -10,6 +10,4 @@ include(CMakeDependentOption)
 
 set(BIN_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
-
-
 add_subdirectory(source)
