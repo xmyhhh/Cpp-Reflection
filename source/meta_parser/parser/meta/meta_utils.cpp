@@ -207,6 +207,12 @@ namespace Utils
         return source_string;
     }
 
+    std::string remove(std::string& source_string, char taget_char)
+    {
+        source_string.erase(remove(source_string.begin(), source_string.end(), taget_char), source_string.end());
+        return source_string;
+    }
+
     std::string toUpper(std::string& source_string)
     {
         transform(source_string.begin(), source_string.end(), source_string.begin(), ::toupper);

@@ -39,6 +39,8 @@ namespace Utils
 
     std::string replace(std::string& source_string, char taget_char, const char new_char);
 
+    std::string remove(std::string& source_string, char taget_char);
+
     std::string toUpper(std::string& source_string);
 
     std::string join(std::vector<std::string> context_list, std::string separator);

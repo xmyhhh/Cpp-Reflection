@@ -129,6 +129,7 @@ bool MetaParser::parseProject()
     {
         std::string temp_string(include_item);
         Utils::replace(temp_string, '\\', '/');
+        Utils::remove(temp_string, '\n');
         include_file << "#include  \"" << temp_string << "\"" << std::endl;
     }
 
@@ -142,12 +143,12 @@ int MetaParser::parse(void)
 
 
 
-    //bool parse_include_ = parseProject();
-    //if (!parse_include_)
-    //{
-    //    std::cerr << "Parsing project file error! " << std::endl;
-    //    return -1;
-    //}
+    bool parse_include_ = parseProject();
+    if (!parse_include_)
+    {
+        std::cerr << "Parsing project file error! " << std::endl;
+        return -1;
+    }
 
     std::cerr << "Parsing the whole project..." << std::endl;
     int is_show_errors      = m_is_show_errors ? 1 : 0;
@@ -191,38 +192,26 @@ int MetaParser::parse(void)
 
     auto cursor = clang_getTranslationUnitCursor(m_translation_unit);
 
+
     clang_visitChildren(
-        cursor,
+        cursor, //Root cursor
         [](CXCursor current_cursor, CXCursor parent, CXClientData client_data) {
-            CXType cursor_type = clang_getCursorType(current_cursor);
 
             CXString current_display_name = clang_getCursorDisplayName(current_cursor);
             //Allocate a CXString representing the name of the current cursor
 
             std::cout << "Visiting element " << clang_getCString(current_display_name) << "\n";
+            //Print the char* value of current_display_name
 
-            CXString type_kind_spelling = clang_getTypeKindSpelling(cursor_type.kind);
-            std::cout << "Type Kind: " << clang_getCString(type_kind_spelling);
-            clang_disposeString(type_kind_spelling);
+            clang_disposeString(current_display_name);
+            //Since clang_getCursorDisplayName allocates a new CXString, it must be freed. This applies
+            //to all functions returning a CXString
 
-            if (cursor_type.kind == CXType_Pointer ||                     // If cursor_type is a pointer
-                cursor_type.kind == CXType_LValueReference ||              // or an LValue Reference (&)
-                cursor_type.kind == CXType_RValueReference) {               // or an RValue Reference (&&),
-                CXType pointed_to_type = clang_getPointeeType(cursor_type);// retrieve the pointed-to type
-
-                CXString pointed_to_type_spelling = clang_getTypeSpelling(pointed_to_type);     // Spell out the entire
-                std::cout << "pointing to type: " << clang_getCString(pointed_to_type_spelling);// pointed-to type
-                clang_disposeString(pointed_to_type_spelling);
-            }
-            else if (cursor_type.kind == CXType_Record) {
-                CXString type_spelling = clang_getTypeSpelling(cursor_type);
-                std::cout << ", namely " << clang_getCString(type_spelling);
-                clang_disposeString(type_spelling);
-            }
-            std::cout << "\n";
             return CXChildVisit_Recurse;
-        },
-        nullptr
+
+
+        }, //CXCursorVisitor: a function pointer
+        nullptr //client_data
     );
 
     Namespace temp_namespace;
@@ -260,7 +249,10 @@ void MetaParser::buildClassAST(const Cursor& cursor, Namespace& current_namespac
         {
             auto class_ptr = std::make_shared<Class>(child, current_namespace);
 
+            std::cerr << child.getDisplayName() << std::endl;
             TRY_ADD_LANGUAGE_TYPE(class_ptr, classes);
+
+            
         }
         else
         {
