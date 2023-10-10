@@ -4,17 +4,25 @@
 
 
 
-CLASS() User
+CLASS(auto) User
 {
-    PROPERTY()
-    int id;
+	PROPERTY()
+		int id;
+};
+
+CLASS(auto) Shop
+{
+	PROPERTY()
+		int id;
+	PROPERTY()
+		int Goods_num;
 };
 
 
 class Goods
 {
-   
-   int id;
+
+	int id;
 };
 
 //Class const * GetClassImpl(ClassTag<User>)

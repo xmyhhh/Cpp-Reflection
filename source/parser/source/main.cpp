@@ -53,13 +53,13 @@ int parse(std::string target_parse_json_file,
 	ClangParser parser(target_parse_json_file, temp_folder, clang_include_folder);
 
 
-	int result = parser.parse();
+	int result = parser.Parse();
 	if (0 != result)
 	{
 		return result;
 	}
 
-	parser.generateFiles();
+	parser.GenerateFiles();
 
 	return 0;
 }

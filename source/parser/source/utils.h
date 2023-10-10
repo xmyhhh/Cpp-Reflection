@@ -18,6 +18,10 @@
 class StringUtils {
 public:
 
+    static bool contain(std::string input, std::string sub) {
+        return input.find(sub) != std::string::npos;
+    }
+
    static std::vector<std::string> Split(std::string input, std::string pat)
     {
         std::vector<std::string> ret_list;

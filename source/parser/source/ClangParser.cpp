@@ -1,10 +1,10 @@
 #include "ClangParser.h"
-#include "utils.h"
 
 
 
 
-ClangParser::ClangParser(std::string _target_parse_json_file, std::string _temp_folder, std::string _clang_include_folder):
+
+ClangParser::ClangParser(std::string _target_parse_json_file, std::string _temp_folder, std::string _clang_include_folder) :
 	target_parse_json_file_path(_target_parse_json_file),
 	temp_folder_path(_temp_folder),
 	clang_include_folder(_clang_include_folder)
@@ -12,7 +12,7 @@ ClangParser::ClangParser(std::string _target_parse_json_file, std::string _temp_
 
 }
 
-int ClangParser::parse()
+int ClangParser::Parse()
 {
 	if (GenerateParseHeader() != true) {
 		return -1;
@@ -55,49 +55,31 @@ int ClangParser::parse()
 	CXCursor cursor = clang_getTranslationUnitCursor(m_translation_unit);
 
 
-
 	clang_visitChildren(
 		cursor,
 		[](CXCursor current_cursor, CXCursor parent, CXClientData client_data) {
 
-			auto Get_child_cursor = [](CXCursor current_cursor)->std::vector<CXCursor> {
-				std::vector<CXCursor> res;
-				clang_visitChildren(
-					current_cursor,
-					[](CXCursor current_cursor, CXCursor parent, CXClientData data) {
-						auto res = static_cast<std::vector<CXCursor>*>(data);
-
-						res->emplace_back(current_cursor);
-
-						if (current_cursor.kind == CXCursor_LastPreprocessing)
-							return CXChildVisit_Break;
-						return CXChildVisit_Continue;
-					},
-					&res
-				);
-				return res;
-				};
-
 			switch (clang_getCursorKind(current_cursor))
 			{
 			case CXCursor_ClassDecl://如果找到class定义
-				for (auto& child : Get_child_cursor(current_cursor)) {
-					if (child.kind != CXCursor_AnnotateAttr)
-						continue;
-					else {
-						//如果该class有AnnotateAttr
-						std::cerr << ClangCursorUtils::GetDisplayName(current_cursor) << std::endl;
-						std::cerr << ClangCursorUtils::GetDisplayName(child)<<std::endl;
-					}
+			{
+				std::vector<std::string> propertyArray;
+				if (ClangCursorUtils::CursorAnnotateAttrCamp(current_cursor, ReflectionProperty::Class_AnnotateAttr, propertyArray))
+					//如果该class有AnnotateAttr，并且是class AnnotateAttr
+					std::unique_ptr<TypeBase> type = std::make_unique<RClass>(current_cursor);
+				/*std::cerr << ClangCursorUtils::GetDisplayName(current_cursor) << std::endl;
+				std::cerr << ClangCursorUtils::GetDisplayName(child) << std::endl;*/
+				else {
+
 				}
+
 				break;
+			}
 			default:
 				break;
 			}
 
 			return CXChildVisit_Recurse;
-
-
 		},
 		nullptr
 	);
@@ -108,7 +90,7 @@ int ClangParser::parse()
 	return 0;
 }
 
-int ClangParser::generateFiles()
+int ClangParser::GenerateFiles()
 {
 	return 0;
 }
