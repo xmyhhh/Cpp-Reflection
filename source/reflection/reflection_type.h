@@ -1,27 +1,19 @@
 #include <vector>
 
 
-#ifdef __METAREFLECT__
+#ifdef __REFLECT__
 #define CLASS(...) class __attribute__((annotate("reflect-class;" #__VA_ARGS__)))
 #define UNION(...) union __attribute__((annotate("reflect-class;" #__VA_ARGS__)))
 #define PROPERTY(...) __attribute__((annotate("reflect-property;" #__VA_ARGS__)))
 #define FUNCTION(...) __attribute__((annotate("reflect-function;" #__VA_ARGS__)))
-#define META_OBJECT
-#else /* else __METAREFLECT__ */
+
+#else 
 #define CLASS(...) class
 #define UNION(...) union
 #define PROPERTY(...)
 #define FUNCTION(...)
-#define META_OBJECT \
-        friend struct PrimitiveResolver; \
-        static constexpr bool IsReflected = true; \
-        template<class T> \
-        friend constexpr bool AfterSerialize(T *) noexcept; \
-        template<class T> \
-        friend constexpr bool BeforeSerialize(T *) noexcept; \
-        template<class T> \
-        friend metareflect::Class const *metareflect::detail::GetClassImpl(metareflect::ClassTag<T>) noexcept;
-#endif /* __METAREFLECT__ */
+
+#endif 
 
 /* ========================================================================= */
 /* Public API                                                                */

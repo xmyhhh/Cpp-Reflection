@@ -83,4 +83,28 @@ public:
         }
         return result[result.size() - 1];
     }
+
+
+   static std::string GetFilePath(std::string path)
+   {
+       if (path.size() < 1)
+       {
+           return std::string();
+       }
+
+       std::vector<std::string> result = StringUtils::Split(path, "/");
+
+       if (result.size() < 1)
+       {
+           return std::string();
+       }
+
+       std::string  ret_string = result[0];
+       for (int index = 1; index < result.size()-1; ++index)
+       {
+           ret_string += "/" + result[index];
+       }
+
+       return ret_string;
+   }
 };

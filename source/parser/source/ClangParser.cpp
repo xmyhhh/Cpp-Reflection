@@ -2,9 +2,12 @@
 #include "utils.h"
 
 
-ClangParser::ClangParser(std::string _target_parse_json_file, std::string _temp_folder) :
+
+
+ClangParser::ClangParser(std::string _target_parse_json_file, std::string _temp_folder, std::string _clang_include_folder):
 	target_parse_json_file_path(_target_parse_json_file),
-	temp_folder_path(_temp_folder)
+	temp_folder_path(_temp_folder),
+	clang_include_folder(_clang_include_folder)
 {
 
 }
@@ -19,7 +22,7 @@ int ClangParser::parse()
 	std::vector<const char*>clang_arg = { {"-x",
 									   "c++",
 									   "-std=c++11",
-									   "-D__REFLECTION_PARSER__",
+									   "-D__REFLECT__",
 									   "-DNDEBUG",
 									   "-D__clang__",
 									   "-w",
@@ -28,13 +31,79 @@ int ClangParser::parse()
 									   "-ferror-limit=0",
 									   "-o clangLog.txt"} };
 
-	m_index = clang_createIndex(true, 0);
 
-	m_translation_unit = clang_createTranslationUnitFromSourceFile(
+	std::string pre_include = "-I";
+	auto m_work_paths = StringUtils::Split(clang_include_folder, ";");
+	std::string sys_include_temp;
+	for (int index = 0; index < m_work_paths.size(); ++index)
+	{
+		//TODO: fix sys_include_temp release problem
+		sys_include_temp = pre_include + m_work_paths[index];
+		clang_arg.push_back(sys_include_temp.c_str());
+	}
+
+	CXIndex m_index = clang_createIndex(true, 0);
+
+	CXTranslationUnit m_translation_unit = clang_createTranslationUnitFromSourceFile(
 		m_index, parse_header_path.c_str(), static_cast<int>(clang_arg.size()), clang_arg.data(), 0, nullptr);
-	auto cursor = clang_getTranslationUnitCursor(m_translation_unit);
+
+	if (m_translation_unit == nullptr) {
+		std::cerr << "Unable to parse translation unit. Quitting.\n";
+		return -1;
+	}
+
+	CXCursor cursor = clang_getTranslationUnitCursor(m_translation_unit);
 
 
+
+	clang_visitChildren(
+		cursor,
+		[](CXCursor current_cursor, CXCursor parent, CXClientData client_data) {
+
+			auto Get_child_cursor = [](CXCursor current_cursor)->std::vector<CXCursor> {
+				std::vector<CXCursor> res;
+				clang_visitChildren(
+					current_cursor,
+					[](CXCursor current_cursor, CXCursor parent, CXClientData data) {
+						auto res = static_cast<std::vector<CXCursor>*>(data);
+
+						res->emplace_back(current_cursor);
+
+						if (current_cursor.kind == CXCursor_LastPreprocessing)
+							return CXChildVisit_Break;
+						return CXChildVisit_Continue;
+					},
+					&res
+				);
+				return res;
+				};
+
+			switch (clang_getCursorKind(current_cursor))
+			{
+			case CXCursor_ClassDecl://如果找到class定义
+				for (auto& child : Get_child_cursor(current_cursor)) {
+					if (child.kind != CXCursor_AnnotateAttr)
+						continue;
+					else {
+						//如果该class有AnnotateAttr
+						std::cerr << ClangCursorUtils::GetDisplayName(current_cursor) << std::endl;
+						std::cerr << ClangCursorUtils::GetDisplayName(child)<<std::endl;
+					}
+				}
+				break;
+			default:
+				break;
+			}
+
+			return CXChildVisit_Recurse;
+
+
+		},
+		nullptr
+	);
+
+	clang_disposeTranslationUnit(m_translation_unit);
+	clang_disposeIndex(m_index);
 
 	return 0;
 }
@@ -65,7 +134,7 @@ bool ClangParser::GenerateParseHeader()
 	auto         inlcude_files = StringUtils::Split(context, ";");
 	std::fstream include_file;
 
-	parse_header_path = temp_folder_path + "/parse_header_tmp.h";
+	parse_header_path = temp_folder_path + "/parser_header_tmp.h";
 
 	include_file.open(parse_header_path, std::ios::out);
 	if (!include_file.is_open())

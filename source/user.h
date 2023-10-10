@@ -1,20 +1,25 @@
-#include <string>
-#include <vector>
 
 #include "reflection/reflection_type.h"
 
 
+
+
 CLASS() User
 {
+    PROPERTY()
     int id;
-    std::string name;
-    std::vector<std::string> pets;
 };
 
 
-Class const * GetClassImpl(ClassTag<User>)
+class Goods
 {
-    static Class clazz;
    
-    return &clazz;
-}
+   int id;
+};
+
+//Class const * GetClassImpl(ClassTag<User>)
+//{
+//    static Class clazz;
+//   
+//    return &clazz;
+//}
