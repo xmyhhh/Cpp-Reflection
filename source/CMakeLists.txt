@@ -5,7 +5,7 @@ message(xmy include)
 message(${RUNTIME_HEADS})
 add_executable(MAIN main.cpp)
 
-add_subdirectory(meta_parser)
+add_subdirectory(parser)
 
 include(precompile/precompile.cmake)
 set(CODEGEN_TARGET "PreCompile")
