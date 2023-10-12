@@ -8,6 +8,11 @@ CLASS(auto) User
 {
 	PROPERTY()
 		int id;
+	FUNCTION()
+		void add() {
+
+	}
+
 };
 
 CLASS(auto) Shop
@@ -16,6 +21,10 @@ CLASS(auto) Shop
 		int id;
 	PROPERTY()
 		int Goods_num;
+	FUNCTION()
+	void b() {
+
+	}
 };
 
 

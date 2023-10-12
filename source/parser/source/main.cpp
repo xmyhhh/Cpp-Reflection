@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 	{
 		std::cerr << "Arguments parse error!" << std::endl
 			<< "Please call the tool like this:" << std::endl
-			<< "meta_parser  project_file_name  include_file_name_to_generate  project_base_directory "
+			<< "meta_parser.exe  target_parse_json_file  clang_include_folder  temp_folder "
 			"sys_include_directory module_name showErrors(0 or 1)"
 			<< std::endl
 			<< std::endl;

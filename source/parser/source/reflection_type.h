@@ -56,44 +56,53 @@ public:
 
 			clang_visitChildren(
 				_current_cursor,
-				[](CXCursor current_cursor, CXCursor parent, CXClientData client_data) {
+				[](CXCursor current_cursor, CXCursor parent, CXClientData data) {
 					switch (clang_getCursorKind(current_cursor)) {
-						case CXCursor_FieldDecl: {
-							std::cerr << "find Field: " << ClangCursorUtils::GetDisplayName(current_cursor) << std::endl;
-							break;
-						}
-						case CXCursor_FunctionDecl: {
-							std::cerr << "find Function: " << ClangCursorUtils::GetDisplayName(current_cursor) << std::endl;
-							break;
-						}
+					case CXCursor_FieldDecl: {
+						std::cerr << "find Field: " << ClangCursorUtils::GetDisplayName(current_cursor) << std::endl;
+						auto res = static_cast<RClass*>(data);
+						res->AddField(std::make_unique<RField>(current_cursor));
+						break;
+					}
+					case CXCursor_CXXMethod: {
+						std::cerr << "find Function: " << ClangCursorUtils::GetDisplayName(current_cursor) << std::endl;
+						auto res = static_cast<RClass*>(data);
+						res->AddFunction(std::make_unique<RFunction>(current_cursor));
+						break;
+					}
 					}
 
 					return CXChildVisit_Recurse;
 				},
-				nullptr
+				this
 			);
 		}
 	}
 
-	void AddField(RField const* field)
+	void AddField(std::unique_ptr<RField> field)
 	{
 		m_fields.push_back(field);
 	}
 
-	void
-		AddFunction(RFunction const* function)
+	void AddFunction(std::unique_ptr<RFunction> function)
 	{
 		m_functions.push_back(function);
 	}
 private:
-	std::vector<RField const*> m_fields;
-	std::vector<RFunction const*> m_functions;
+	std::vector<std::unique_ptr<RField>> m_fields;
+	std::vector< std::unique_ptr<RFunction>> m_functions;
 };
 
 class RFunction :public TypeBase {
+public:
+	RFunction(CXCursor _current_cursor) {
 
+	}
 };
 
 class RField :public TypeBase {
+public:
+	RField(CXCursor _current_cursor) {
 
+	}
 };
