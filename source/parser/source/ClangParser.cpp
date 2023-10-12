@@ -64,11 +64,11 @@ int ClangParser::Parse()
 			case CXCursor_ClassDecl://如果找到class定义
 			{
 				std::vector<std::string> propertyArray;
-				if (ClangCursorUtils::CursorAnnotateAttrCamp(current_cursor, ReflectionProperty::Class_AnnotateAttr, propertyArray))
+				if (ClangCursorUtils::CursorAnnotateAttrCamp(current_cursor, ReflectionProperty::Class_AnnotateAttr, propertyArray)) {
 					//如果该class有AnnotateAttr，并且是class AnnotateAttr
-					std::unique_ptr<TypeBase> type = std::make_unique<RClass>(current_cursor);
-				/*std::cerr << ClangCursorUtils::GetDisplayName(current_cursor) << std::endl;
-				std::cerr << ClangCursorUtils::GetDisplayName(child) << std::endl;*/
+					std::unique_ptr<TypeBase> type = std::make_unique<RClass>(current_cursor, propertyArray);
+					std::cerr <<"find class: " << ClangCursorUtils::GetDisplayName(current_cursor) << std::endl;
+				}
 				else {
 
 				}
