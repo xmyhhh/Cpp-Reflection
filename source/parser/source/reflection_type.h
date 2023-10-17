@@ -39,6 +39,7 @@ namespace ReflectionProperty
     const auto WhiteListMethods = "WhiteListMethods";
 } // namespace NativeProperty
 
+class RClass;
 
 class TypeBase
 {
@@ -60,9 +61,10 @@ protected:
 class RField : public TypeBase
 {
 public:
-    RField(CXCursor _current_cursor): TypeBase(_current_cursor)
+    RField(CXCursor _current_cursor, RClass* parent_class): TypeBase(_current_cursor)
     {
         field_type_name = ClangCursorUtils::GetCXTypeName(clang_getCursorType(_current_cursor));
+        parent_class_ptr = parent_class;
     }
 
     std::string GetFiledTypeName()
@@ -70,16 +72,31 @@ public:
         return field_type_name;
     }
 
+    RClass* GetParentClass()
+    {
+        return parent_class_ptr;
+    }
+
 private:
     std::string field_type_name;
+    RClass* parent_class_ptr;
 };
 
 class RFunction : public TypeBase
 {
 public:
-    RFunction(CXCursor _current_cursor): TypeBase(_current_cursor)
+    RFunction(CXCursor _current_cursor, RClass* parent_class): TypeBase(_current_cursor)
     {
+        parent_class_ptr = parent_class;
     }
+
+    RClass* GetParentClass()
+    {
+        return parent_class_ptr;
+    }
+
+private:
+    RClass* parent_class_ptr;
 };
 
 class RClass : public TypeBase
@@ -102,8 +119,8 @@ public:
                         {
                             std::cerr << "find Field: " << ClangCursorUtils::GetCXCursorName(current_cursor) <<
                                 std::endl;
-                            auto res = static_cast<RClass*>(data);
-                            res->AddField(std::make_shared<RField>(current_cursor));
+                            auto parent_class_ptr = static_cast<RClass*>(data);
+                            parent_class_ptr->AddField(std::make_shared<RField>(current_cursor, parent_class_ptr));
                             break;
                         }
                     case CXCursor_CXXMethod:

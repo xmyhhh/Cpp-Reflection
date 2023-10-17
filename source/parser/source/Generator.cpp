@@ -29,11 +29,15 @@ std::string RefelactionGenerator::FieldGenerate(std::shared_ptr<RField> field)
 {
     std::string filed_name = field->GetNmae();
     std::string filed_type_name = field->GetFiledTypeName();
-    
+    RClass* filed_parent_class_ptr = field->GetParentClass();
     std::string out_string = "";
     out_string += "static const char* GetFiledName_" + filed_name + "(){return " + StringUtils::DoubleQuote(filed_name)
         + ";}\n";
-    out_string += "static const char* GetFiledTypeName_" + filed_name + "(){return " + StringUtils::DoubleQuote(filed_type_name)
+    out_string += "static void Set_" + filed_name + "(){return " + StringUtils::DoubleQuote(filed_type_name)
+        + ";}\n";
+
+    out_string += "static const char* GetFiledName_" + filed_name + "(void* instance, void* value){" + "static_cast<" +
+        filed_parent_class_ptr->GetNmae() + "*>(instance)->x = *static_cast<" + filed_type_name + "*>(value)"
         + ";}\n";
     return out_string;
 }
