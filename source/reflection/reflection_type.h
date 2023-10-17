@@ -43,7 +43,6 @@ class Type
 public:
     size_t m_size;
     char const* m_name;
-
 };
 
 struct Field{

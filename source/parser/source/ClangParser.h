@@ -37,7 +37,7 @@ private:
 	std::string parse_header_path;
 	std::string clang_include_folder;
 
-	std::vector<std::unique_ptr<RClass>> m_class;
+	std::vector<std::shared_ptr<RClass>> m_class;
 
 };
 
