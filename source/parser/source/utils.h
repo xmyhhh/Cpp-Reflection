@@ -89,6 +89,22 @@ public:
         source_string.erase(remove(source_string.begin(), source_string.end(), taget_char), source_string.end());
         return source_string;
     }
+
+    static void StringIndentJoin(std::string& src, const std::string& str_to_join, int indent_num)
+    {
+        if (src.length() > 0)
+        {
+            if (src[src.length() - 1] != '\n')
+            {
+                src += '\n';
+            }
+        }
+        for (int i = 0; i < indent_num; i++)
+        {
+            src += '\t';
+        }
+        src += str_to_join;
+    }
 };
 
 class FileUtils
@@ -175,7 +191,7 @@ public:
     {
         return GetCXTypeName(clang_getCursorType(cursor));
     }
-    
+
     static std::string GetCXTypeName(CXType type)
     {
         std::string display_name;
@@ -184,7 +200,7 @@ public:
 
         return display_name;
     }
-    
+
     static std::string GetSourceFile(CXCursor cursor)
     {
         auto range = clang_Cursor_getSpellingNameRange(cursor, 0, 0);

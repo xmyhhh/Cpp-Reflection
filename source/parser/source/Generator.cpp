@@ -31,13 +31,45 @@ std::string RefelactionGenerator::FieldGenerate(std::shared_ptr<RField> field)
     std::string filed_type_name = field->GetFiledTypeName();
     RClass* filed_parent_class_ptr = field->GetParentClass();
     std::string out_string = "";
-    out_string += "static const char* GetFiledName_" + filed_name + "(){return " + StringUtils::DoubleQuote(filed_name)
-        + ";}\n";
-    out_string += "static void Set_" + filed_name + "(){return " + StringUtils::DoubleQuote(filed_type_name)
-        + ";}\n";
 
-    out_string += "static const char* GetFiledName_" + filed_name + "(void* instance, void* value){" + "static_cast<" +
-        filed_parent_class_ptr->GetNmae() + "*>(instance)->x = *static_cast<" + filed_type_name + "*>(value)"
-        + ";}\n";
+    StringUtils::StringIndentJoin(
+        out_string,
+        "//Filed " + filed_type_name + " " + filed_name + " Generate \n",
+        1);
+
+    //Filed Name
+    StringUtils::StringIndentJoin(
+        
+        out_string,
+        "static const char* GetFiledName_" + filed_name + "(){return " + StringUtils::DoubleQuote(filed_name)
+        + ";}\n",
+        1);
+
+
+    //Filed Type Name
+    StringUtils::StringIndentJoin(
+        out_string,
+        "static const char* GetFiledTypeName_" + filed_name + "(){return " + StringUtils::DoubleQuote(
+            filed_type_name) + ";}\n",
+        1);
+
+
+    //Filed Set
+    StringUtils::StringIndentJoin(
+        out_string,
+        "static void SetFiled_" + filed_name + "(void* instance, void* value){static_cast<" +
+        filed_parent_class_ptr->GetNmae() + "*>(instance)->" + filed_name + " = *static_cast<" + filed_type_name +
+        "*>(value)" + ";}\n",
+        1);
+
+
+    //Filed Get
+    StringUtils::StringIndentJoin(
+        out_string,
+        "static void* GetFiled_" + filed_name + "(void* instance){return static_cast<void*>(&(static_cast<" +
+        filed_parent_class_ptr->GetNmae() + "*>(instance)->" + filed_name + "));}\n",
+        1);
+
+
     return out_string;
 }
